@@ -1,7 +1,7 @@
 const express = require("express");
 const connectDB = require("./database/userDatabase");
 const User = require("./models/User");
-const corsConfig = require('./config.js/cors')
+const corsConfig = require('./config.js/cors');
 
 const loginRoute = require('./routes/loginRoute');
 const signupRoute = require('./routes/signupRoute');
@@ -60,7 +60,10 @@ app.use("/*path", (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Questions upload: http://localhost:${PORT}/api/questions/upload`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+module.exports = app;
+
