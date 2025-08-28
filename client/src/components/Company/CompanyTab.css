@@ -1,0 +1,222 @@
+.company-tab-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 20px;
+  padding: 28px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.company-tab-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2563eb, #10b981);
+  border-radius: 20px 20px 0 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.company-tab-card:hover::before {
+  transform: scaleX(1);
+}
+
+.company-tab-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(37, 99, 235, 0.15);
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+.company-tab-header {
+  margin-bottom: 16px;
+}
+
+.company-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  text-transform: capitalize;
+  letter-spacing: -0.5px;
+  transition: all 0.3s ease;
+}
+
+.company-tab-card:hover .company-name {
+  color: #2563eb;
+  transform: translateX(4px);
+}
+
+.company-tab-body {
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.company-description {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  transition: color 0.3s ease;
+}
+
+.company-tab-card:hover .company-description {
+  color: #475569;
+}
+
+.company-tab-stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.question-count,
+.difficulty-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid;
+}
+
+.question-count {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #2563eb;
+  border-color: #93c5fd;
+}
+
+.difficulty-badge {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #10b981;
+  border-color: #6ee7b7;
+}
+
+.company-tab-footer {
+  margin-top: auto;
+}
+
+.view-questions-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.view-questions-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.company-tab-card:hover .view-questions-btn {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+.company-tab-card:hover .view-questions-btn::before {
+  left: 100%;
+}
+
+.company-tab-card:hover .question-count {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #bfdbfe, #93c5fd);
+}
+
+.company-tab-card:hover .difficulty-badge {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+}
+
+.company-tab-card:active {
+  transform: translateY(-4px) scale(0.98);
+}
+
+.company-tab-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@media (max-width: 768px) {
+  .company-tab-card {
+    padding: 24px;
+    min-height: 160px;
+  }
+  
+  .company-name {
+    font-size: 1.25rem;
+  }
+  
+  .company-description {
+    font-size: 13px;
+  }
+  
+  .view-questions-btn {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .company-tab-card {
+    padding: 20px;
+    min-height: 140px;
+  }
+  
+  .company-name {
+    font-size: 1.125rem;
+  }
+  
+  .company-tab-stats {
+    gap: 8px;
+  }
+  
+  .question-count,
+  .difficulty-badge {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
