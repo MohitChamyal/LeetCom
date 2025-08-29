@@ -8,7 +8,6 @@ const LoginSignUp = ({ setAdminDetail }) => {
 
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [debugInfo, setDebugInfo] = useState(null);
 
   const [loginData, setLoginData] = useState({
     email: '',
@@ -26,15 +25,7 @@ const LoginSignUp = ({ setAdminDetail }) => {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    const loadDebugInfo = async () => {
-      try {
-        const info = await adminAPI.getDebugInfo();
-        setDebugInfo(info);
-      } catch (error) {
-        console.log(error.message);
-      }
-    };
-
+    ;
     const testConnection = async () => {
       try {
         await adminAPI.testConnection();
@@ -42,8 +33,6 @@ const LoginSignUp = ({ setAdminDetail }) => {
         console.log(error.message);
       }
     };
-
-    loadDebugInfo();
     testConnection();
   }, []);
 
