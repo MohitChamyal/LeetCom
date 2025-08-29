@@ -19,12 +19,20 @@ app.use(express.urlencoded({ extended: true }));
 
 connectDB();
 
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "LeetCom API is running!",
+    status: "OK" 
+  });
+});
+
 // Admin routes
 app.post("/api/admin/signup", signupRoute);
 app.post("/api/admin/login", loginRoute);
 app.use("/api/questions", questionsRoute);
 
 // Admin profile route
+
 app.get("/api/admin/profile/:id", async (req, res) => {
   try {
     const admin = await User.findById(req.params.id).select("-password");
@@ -65,3 +73,4 @@ if (process.env.NODE_ENV !== 'production') {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
+module.exports = app;
