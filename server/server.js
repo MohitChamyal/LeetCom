@@ -1,23 +1,25 @@
 const express = require("express");
 const connectDB = require("./database/userDatabase");
 const User = require("./models/User");
-const cors = require('cors');
+const cors = require("cors");
 
-const loginRoute = require('./routes/loginRoute');
-const signupRoute = require('./routes/signupRoute');
-const questionsRoute = require('./routes/questionsRoute'); 
+const loginRoute = require("./routes/loginRoute");
+const signupRoute = require("./routes/signupRoute");
+const questionsRoute = require("./routes/questionsRoute");
 
 require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({
-  origin: ["http://localhost:5173", "https://leetcom-frontend.vercel.app/"],
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://leetcom-frontend.vercel.app/"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,10 +32,10 @@ app.post("/api/admin/login", loginRoute);
 app.use("/api/questions", questionsRoute);
 
 // Admin profile route
-app.get("/", async(req, res)=>{
+app.get("/", async (req, res) => {
   res.send("HELLO");
   res.end();
-})
+});
 app.get("/api/admin/profile/:id", async (req, res) => {
   try {
     const admin = await User.findById(req.params.id).select("-password");
@@ -62,9 +64,9 @@ app.use("/*path", (req, res) => {
       "POST /api/admin/signup",
       "POST /api/admin/login",
       "GET /api/admin/profile/:id",
-      "POST /api/questions/upload",       
-      "GET /api/questions/:companyName",   
-      "GET /api/questions"                
+      "POST /api/questions/upload",
+      "GET /api/questions/:companyName",
+      "GET /api/questions",
     ],
   });
 });
