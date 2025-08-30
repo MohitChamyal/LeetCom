@@ -3,6 +3,8 @@ const connectDB = require("./database/userDatabase");
 const User = require("./models/User");
 const cors = require("cors");
 const errorHandler = require("./middleware/errorHandler");
+const helmet = require("helmet");
+const compression = require("compression");
 
 const loginRoute = require("./routes/loginRoute");
 const signupRoute = require("./routes/signupRoute");
@@ -13,9 +15,27 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Security middleware
+app.use(helmet());
+app.use(compression());
+
+// Configure allowed origins based on environment
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? ['https://leetcom.vercel.app']
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", process.env.VITE_FRONTEND_URL],
+    origin: function(origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
