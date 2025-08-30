@@ -13,7 +13,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // CORS middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://leetcom-frontend.vercel.app"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
