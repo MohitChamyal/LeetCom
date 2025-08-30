@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require("./database/userDatabase");
 const User = require("./models/User");
 const cors = require("cors");
+const errorHandler = require("./middleware/errorHandler");
 
 const loginRoute = require("./routes/loginRoute");
 const signupRoute = require("./routes/signupRoute");
@@ -14,7 +15,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://leetcom-frontend.vercel.app/"],
+    origin: ["http://localhost:5173", process.env.VITE_FRONTEND_URL],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -33,8 +34,11 @@ app.use("/api/questions", questionsRoute);
 
 // Admin profile route
 app.get("/", async (req, res) => {
-  res.send("HELLO");
-  res.end();
+  res.json({
+    status: "ok",
+    message: "LeetCom API is running",
+    version: "1.0.0"
+  });
 });
 app.get("/api/admin/profile/:id", async (req, res) => {
   try {
@@ -54,23 +58,9 @@ app.get("/api/admin/profile/:id", async (req, res) => {
   }
 });
 
-app.use("/*path", (req, res) => {
-  res.status(404).json({
-    success: false,
-    error: "Route not found",
-    path: req.originalUrl,
-    method: req.method,
-    availableRoutes: [
-      "POST /api/admin/signup",
-      "POST /api/admin/login",
-      "GET /api/admin/profile/:id",
-      "POST /api/questions/upload",
-      "GET /api/questions/:companyName",
-      "GET /api/questions",
-    ],
-  });
+// Start the server regardless of environment
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+module.exports = app;
