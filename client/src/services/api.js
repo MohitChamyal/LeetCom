@@ -1,19 +1,13 @@
 import axios from 'axios';
 
-// Get the backend URL from environment variables
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
-
-if (!API_BASE_URL) {
-  console.warn('VITE_BACKEND_URL is not set. Using default localhost URL.');
-}
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL || 'http://localhost:5000'}/api`,
+  baseURL: `${API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 10000,
-  withCredentials: true, // Enable sending cookies in cross-origin requests
 });
 
 export const testConnection = async () => {

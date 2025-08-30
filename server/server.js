@@ -2,9 +2,6 @@ const express = require("express");
 const connectDB = require("./database/userDatabase");
 const User = require("./models/User");
 const cors = require("cors");
-const errorHandler = require("./middleware/errorHandler");
-const helmet = require("helmet");
-const compression = require("compression");
 
 const loginRoute = require("./routes/loginRoute");
 const signupRoute = require("./routes/signupRoute");
@@ -15,27 +12,9 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security middleware
-app.use(helmet());
-app.use(compression());
-
-// Configure allowed origins based on environment
-const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? ['https://leetcom.vercel.app']
-  : ['http://localhost:5173', 'http://localhost:3000'];
-
 app.use(
   cors({
-    origin: function(origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
+    origin: ["http://localhost:5173", "https://leetcom-frontend.vercel.app/"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -54,11 +33,8 @@ app.use("/api/questions", questionsRoute);
 
 // Admin profile route
 app.get("/", async (req, res) => {
-  res.json({
-    status: "ok",
-    message: "LeetCom API is running",
-    version: "1.0.0"
-  });
+  res.send("HELLO");
+  res.end();
 });
 app.get("/api/admin/profile/:id", async (req, res) => {
   try {
@@ -78,9 +54,6 @@ app.get("/api/admin/profile/:id", async (req, res) => {
   }
 });
 
-// Start the server regardless of environment
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
-
-module.exports = app;
