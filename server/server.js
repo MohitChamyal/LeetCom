@@ -1,7 +1,7 @@
 const express = require("express");
+const cors = require("cors");
 const connectDB = require("./database/userDatabase");
 const User = require("./models/User");
-const corsConfig = require("./config.js/cors");
 
 const loginRoute = require("./routes/loginRoute");
 const signupRoute = require("./routes/signupRoute");
@@ -12,12 +12,23 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(corsConfig);
+// CORS middleware
+app.use(cors({
+  origin: ["http://localhost:5173", "https://your-frontend-url.vercel.app"],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 connectDB();
+
+// Health check route
+app.get("/", async (req, res) => {
+  res.json({ message: "LeetCom Backend API is running!" });
+});
 
 // Admin routes
 app.post("/api/admin/signup", signupRoute);
@@ -25,10 +36,6 @@ app.post("/api/admin/login", loginRoute);
 app.use("/api/questions", questionsRoute);
 
 // Admin profile route
-app.get("/", async (req, res) => {
-  res.send("HELLO");
-  res.end();
-});
 app.get("/api/admin/profile/:id", async (req, res) => {
   try {
     const admin = await User.findById(req.params.id).select("-password");
@@ -47,27 +54,5 @@ app.get("/api/admin/profile/:id", async (req, res) => {
   }
 });
 
-app.use("/*path", (req, res) => {
-  res.status(404).json({
-    success: false,
-    error: "Route not found",
-    path: req.originalUrl,
-    method: req.method,
-    availableRoutes: [
-      "POST /api/admin/signup",
-      "POST /api/admin/login",
-      "GET /api/admin/profile/:id",
-      "POST /api/questions/upload",
-      "GET /api/questions/:companyName",
-      "GET /api/questions",
-    ],
-  });
-});
-
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
-
+// Export for Vercel
 module.exports = app;
