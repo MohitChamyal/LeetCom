@@ -1,11 +1,11 @@
 const express = require("express");
 const connectDB = require("./database/userDatabase");
 const User = require("./models/User");
-const corsConfig = require('./config.js/cors')
+const corsConfig = require("./config.js/cors");
 
-const loginRoute = require('./routes/loginRoute');
-const signupRoute = require('./routes/signupRoute');
-const questionsRoute = require('./routes/questionsRoute'); 
+const loginRoute = require("./routes/loginRoute");
+const signupRoute = require("./routes/signupRoute");
+const questionsRoute = require("./routes/questionsRoute");
 
 require("dotenv").config();
 
@@ -25,10 +25,10 @@ app.post("/api/admin/login", loginRoute);
 app.use("/api/questions", questionsRoute);
 
 // Admin profile route
-app.get("/", async(req, res)=>{
+app.get("/", async (req, res) => {
   res.send("HELLO");
   res.end();
-})
+});
 app.get("/api/admin/profile/:id", async (req, res) => {
   try {
     const admin = await User.findById(req.params.id).select("-password");
@@ -57,14 +57,17 @@ app.use("/*path", (req, res) => {
       "POST /api/admin/signup",
       "POST /api/admin/login",
       "GET /api/admin/profile/:id",
-      "POST /api/questions/upload",       
-      "GET /api/questions/:companyName",   
-      "GET /api/questions"                
+      "POST /api/questions/upload",
+      "GET /api/questions/:companyName",
+      "GET /api/questions",
     ],
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Questions upload: http://localhost:${PORT}/api/questions/upload`);
-});
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
