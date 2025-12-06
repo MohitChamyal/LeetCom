@@ -4,6 +4,12 @@ A full-stack web application that helps developers practice coding questions org
 
 ![LeetCom Banner](https://via.placeholder.com/1200x400/2563eb/ffffff?text=LeetCom+-+Company+Wise+LeetCode+Questions)
 
+## 🌐 Live Demo
+
+- **Frontend:** [https://leet-com.vercel.app](https://leet-com.vercel.app)
+- **Backend API:** [https://leet-com-backend.vercel.app](https://leet-com-backend.vercel.app)
+- **Admin Panel:** [https://leet-com.vercel.app/login](https://leet-com.vercel.app/login)
+
 ## ✨ Features
 
 ### 👨‍💼 Admin Features
@@ -23,26 +29,115 @@ A full-stack web application that helps developers practice coding questions org
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React.js 18** - Modern React with Hooks
+- **React.js 19** - Modern React with latest features
+- **Vite** - Fast build tool and dev server
 - **React Router DOM** - Client-side routing
 - **Axios** - HTTP client for API calls
 - **CSS3** - Custom styling with animations
-- **Font Awesome** - Icons and social media links
+- **Vercel** - Frontend hosting platform
 
 ### Backend
 - **Node.js** - JavaScript runtime
 - **Express.js** - Web application framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB object modeling
-- **Multer** - File upload handling
+- **Supabase PostgreSQL** - Cloud-hosted PostgreSQL database
+- **Multer** - File upload handling (memory storage)
 - **bcryptjs** - Password hashing
 - **CSV Parser** - CSV file processing
 - **CORS** - Cross-origin resource sharing
-  
-### Access Application
-- **Frontend:** http://localhost:5173 (or 3000)
-- **Backend API:** http://localhost:5000
-- **Admin Panel:** http://localhost:5173/admin
+- **Vercel Serverless** - Serverless function deployment
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v16 or higher)
+- npm or yarn
+- Supabase account (for database)
+- Vercel account (for deployment)
+
+### Local Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/MohitChamyal/LeetCom.git
+   cd LeetCom
+   ```
+
+2. **Setup Backend**
+   ```bash
+   cd server
+   npm install
+   ```
+
+   Create `.env` file in `server` directory:
+   ```env
+   SUPABASE_URL=your_supabase_project_url
+   SUPABASE_KEY=your_supabase_anon_key
+   JWT_SECRET=your_jwt_secret_key
+   ADMIN_SECRET_KEY=your_admin_secret_key
+   CORS_ORIGIN=http://localhost:5173
+   PORT=5000
+   ```
+
+   Initialize Supabase database:
+   ```bash
+   # Run the SQL schema from server/schema.sql in your Supabase SQL Editor
+   ```
+
+   Start backend server:
+   ```bash
+   npm run dev
+   ```
+
+3. **Setup Frontend**
+   ```bash
+   cd client
+   npm install
+   ```
+
+   Create `.env` file in `client` directory:
+   ```env
+   VITE_BACKEND_URL=http://localhost:5000
+   ```
+
+   Start frontend dev server:
+   ```bash
+   npm run dev
+   ```
+
+4. **Access Application**
+   - **Frontend:** http://localhost:5173
+   - **Backend API:** http://localhost:5000
+   - **Admin Panel:** http://localhost:5173/login
+
+## 📊 Database Schema
+
+### Supabase Tables
+
+**users** table:
+```sql
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**questions** table:
+```sql
+CREATE TABLE questions (
+    id SERIAL PRIMARY KEY,
+    company VARCHAR(255) NOT NULL,
+    difficulty VARCHAR(50) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    frequency DECIMAL(5, 2),
+    acceptance_rate VARCHAR(50),
+    link TEXT,
+    topics TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 ## 📊 CSV Upload Format
 
@@ -57,84 +152,231 @@ To upload questions, prepare a CSV file with these columns:
 | `Link` | LeetCode URL | https://leetcode.com/problems/two-sum/ |
 | `Topics` | Comma-separated tags | Array,Hash Table |
 
+**Sample CSV:**
+```csv
+Difficulty,Title,Frequency,Acceptance Rate,Link,Topics
+Medium,Two Sum,85,45.2%,https://leetcode.com/problems/two-sum/,Array,Hash Table
+Hard,Median of Two Sorted Arrays,60,35.1%,https://leetcode.com/problems/median-of-two-sorted-arrays/,Array,Binary Search
+```
 
 ## 🔐 Admin Access
 
 1. **Create Admin Account:**
-   - Go to `/login`
-   - Click "Register" 
-   - Use the `ADMIN_SECRET_KEY` from your `.env` file
+   - Go to [https://leet-com.vercel.app/login](https://leet-com.vercel.app/login)
+   - Click "Register" tab
+   - Enter username, email, and password
+   - Use the `ADMIN_SECRET_KEY` (contact admin for key)
+   - Click "Sign Up"
 
 2. **Upload Questions:**
    - Login to admin panel
-   - Choose CSV file (filename should match company name)
-   - Enter company name
+   - Click "Choose File" to select CSV
+   - Enter company name (e.g., "Google", "Amazon")
    - Click "Upload Questions"
+   - Wait for success confirmation
 
 3. **Manage Data:**
-   - View uploaded companies
-   - Monitor question counts
-   - Update admin profile
+   - View all uploaded companies
+   - Monitor question counts per company
+   - Upload additional questions (no duplicates)
 
 ## 🌐 API Endpoints
 
-### Authentication
-- `POST /api/admin/signup` - Register new admin
-- `POST /api/admin/login` - Admin login
-- `GET /api/admin/profile/:id` - Get admin profile
+### Authentication Routes
+```
+POST /api/auth/signup    - Register new admin
+POST /api/auth/login     - Admin login
+```
 
-### Questions Management
-- `POST /api/questions/upload` - Upload CSV file
-- `GET /api/questions` - Get all companies
-- `GET /api/questions/:company` - Get company questions
+### Admin Routes
+```
+GET  /api/admin/profile/:id  - Get admin profile by ID
+```
 
-### Health Check
-- `GET /health` - Server health status
+### Questions Routes
+```
+POST /api/questions/upload       - Upload CSV file with questions
+GET  /api/questions/all          - Get all companies
+GET  /api/questions/:company     - Get questions by company name
+```
+
+### Health & Diagnostics
+```
+GET  /                   - API information and available endpoints
+GET  /health             - Server health status
+GET  /api/test           - Test endpoint with environment info
+GET  /api/test-db        - Test Supabase database connection
+```
+
+## 🎨 Project Structure
+
+```
+LeetCom/
+├── client/                      # Frontend React application
+│   ├── public/                  # Static assets
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   │   ├── Admin/           # Admin dashboard
+│   │   │   ├── Company/         # Company questions view
+│   │   │   ├── Footer/          # Footer component
+│   │   │   ├── Home/            # Homepage
+│   │   │   ├── Login/           # Auth pages
+│   │   │   └── NotFound/        # 404 page
+│   │   ├── services/
+│   │   │   └── api.js           # Axios API configuration
+│   │   ├── App.jsx              # Main app component
+│   │   ├── main.jsx             # Entry point
+│   │   └── index.css            # Global styles
+│   ├── .env                     # Environment variables
+│   ├── package.json
+│   ├── vite.config.js
+│   └── vercel.json              # Vercel deployment config
+│
+├── server/                      # Backend Express application
+│   ├── api/
+│   │   └── index.js             # Serverless function entry point
+│   ├── config/
+│   │   └── index.js             # Environment configuration
+│   ├── controllers/
+│   │   └── adminController.js   # Admin business logic
+│   ├── database/
+│   │   └── userDatabase.js      # User database operations
+│   ├── middleware/
+│   │   └── errorHandler.js      # Error handling middleware
+│   ├── models/
+│   │   ├── Questions.js         # Questions model
+│   │   └── User.js              # User model
+│   ├── routes/
+│   │   ├── auth.js              # Authentication routes
+│   │   └── questions.js         # Questions routes
+│   ├── uploads/                 # Temporary CSV uploads
+│   ├── .env                     # Environment variables
+│   ├── db.js                    # Supabase client
+│   ├── schema.sql               # Database schema
+│   ├── package.json
+│   └── vercel.json              # Vercel deployment config
+│
+└── README.md                    # Project documentation
+```
 
 ## 🎨 Key Features Demo
 
 ### 🏠 Homepage
-- Browse all available companies
-- Search companies by name
+- Browse all available companies (Google, Amazon, Microsoft, etc.)
 - View question counts per company
+- Clean, responsive card-based layout
+- Quick navigation to company questions
 
-### 📊 Company Questions
-- Filter by difficulty level
-- Sort by frequency, name, or acceptance rate
-- Direct links to LeetCode problems
-- Topic tags for each question
+### 📊 Company Questions Page
+- **Filtering:** Filter by difficulty (Easy, Medium, Hard, All)
+- **Sorting:** Sort by frequency, title, or acceptance rate
+- **Question Cards:** Display title, difficulty, topics, and links
+- **Direct Links:** Click to open LeetCode problem in new tab
+- **Responsive:** Works on mobile, tablet, and desktop
 
 ### 👨‍💼 Admin Dashboard
-- Secure authentication system
-- Bulk CSV upload with validation
-- Real-time upload progress
-- Data deduplication (no duplicate questions)
+- **Secure Login:** JWT-based authentication
+- **CSV Upload:** Drag-and-drop or click to upload
+- **Progress Tracking:** Real-time upload status
+- **Data Management:** View all companies and question counts
+- **Deduplication:** Prevents duplicate questions automatically
+- **Error Handling:** Clear error messages for failed uploads
 
 ### 🔍 Smart Features
-- **Responsive Design** - Works on all devices
-- **Error Handling** - User-friendly error messages
-- **Loading States** - Smooth user experience
-- **Route Protection** - Secure admin access
-- **404 Handling** - Custom not found pages
+- **Responsive Design** - Mobile-first approach, works on all devices
+- **Error Handling** - User-friendly error messages and fallbacks
+- **Loading States** - Smooth transitions and loading indicators
+- **Route Protection** - Secure admin-only routes
+- **404 Handling** - Custom not found page
+- **CORS Enabled** - Secure cross-origin requests
+- **Serverless Architecture** - Fast, scalable deployment on Vercel
 
 ## 🚀 Deployment
 
-### Deploy Backend (Railway/Render)
-1. Connect your GitHub repository
-2. Set environment variables
-3. Deploy from `server` folder
+### Deploy to Vercel (Recommended)
 
-### Deploy Frontend (Vercel/Netlify)
-1. Connect your GitHub repository
-2. Set build command: `npm run build`
-3. Set output directory: `dist`
-4. Update `VITE_BACKEND_URL` to your deployed backend
+#### Backend Deployment
 
-### Database (MongoDB Atlas)
-1. Create MongoDB Atlas account
-2. Create cluster and database
-3. Get connection string
-4. Update `MONGODB_URL` in environment variables
+1. **Prepare Backend:**
+   - Ensure `server/api/index.js` exists as the entry point
+   - Verify `server/vercel.json` is configured correctly
+   - Check all environment variables are set
+
+2. **Deploy Backend:**
+   ```bash
+   cd server
+   vercel --prod
+   ```
+
+3. **Set Environment Variables in Vercel Dashboard:**
+   - `SUPABASE_URL` - Your Supabase project URL
+   - `SUPABASE_KEY` - Your Supabase anon/public key
+   - `JWT_SECRET` - Secret key for JWT tokens
+   - `ADMIN_SECRET_KEY` - Secret key for admin registration
+   - `CORS_ORIGIN` - Frontend URL (e.g., https://leet-com.vercel.app)
+
+4. **Verify Backend:**
+   - Visit `https://your-backend.vercel.app/health`
+   - Check `https://your-backend.vercel.app/api/test`
+
+#### Frontend Deployment
+
+1. **Update Backend URL:**
+   - Edit `client/.env`
+   - Set `VITE_BACKEND_URL=https://your-backend.vercel.app`
+
+2. **Deploy Frontend:**
+   ```bash
+   cd client
+   npm run build
+   vercel --prod
+   ```
+
+3. **Set Environment Variables in Vercel Dashboard:**
+   - `VITE_BACKEND_URL` - Your deployed backend URL
+
+4. **Verify Frontend:**
+   - Visit your deployed frontend URL
+   - Test login/signup functionality
+   - Try uploading a CSV file
+
+### Deploy to Other Platforms
+
+#### Backend (Railway/Render)
+1. Connect GitHub repository
+2. Set root directory to `server`
+3. Add environment variables
+4. Deploy with build command: `npm install`
+5. Start command: `node api/index.js`
+
+#### Frontend (Netlify)
+1. Connect GitHub repository
+2. Set base directory to `client`
+3. Build command: `npm run build`
+4. Publish directory: `dist`
+5. Add environment variables
+
+### Database Setup (Supabase)
+
+1. **Create Supabase Project:**
+   - Sign up at [supabase.com](https://supabase.com)
+   - Create new project
+   - Copy Project URL and API Key
+
+2. **Create Tables:**
+   - Open SQL Editor in Supabase dashboard
+   - Copy contents of `server/schema.sql`
+   - Execute SQL to create tables
+
+3. **Disable Row Level Security (for development):**
+   ```sql
+   ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+   ALTER TABLE questions DISABLE ROW LEVEL SECURITY;
+   ```
+
+4. **Update Environment Variables:**
+   - Update local `.env` files with Supabase credentials
+   - Update Vercel environment variables
 
 ## 🤝 Contributing
 
@@ -169,52 +411,83 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📈 Future Enhancements
 
-- [ ] User authentication and progress tracking
-- [ ] Bookmarking favorite questions
+- [ ] User authentication and personal progress tracking
+- [ ] Bookmarking and saving favorite questions
 - [ ] Discussion forums for each question
-- [ ] Difficulty-based progress analytics
-- [ ] Email notifications for new questions
-- [ ] API rate limiting and caching
+- [ ] Difficulty-based progress analytics dashboard
+- [ ] Email notifications for newly added questions
+- [ ] API rate limiting and Redis caching
 - [ ] Dark mode theme support
+- [ ] Export questions to PDF/Excel
+- [ ] Question search functionality
+- [ ] Company-wise statistics and insights
+- [ ] Mock interview mode with timer
+- [ ] Social login (Google, GitHub)
 
-## 🐛 Known Issues
+## 🐛 Known Issues & Limitations
 
-- CSV upload requires exact filename matching company name
-- Large CSV files (>5MB) are rejected
-- Admin session expires on browser refresh
+- CSV file size limited to 10MB
+- Admin session requires re-login on page refresh
+- No pagination for large question sets (100+ questions)
+- Cannot edit or delete individual questions (only bulk upload)
+- No user roles (all admins have same permissions)
 
-## 📞 Support
+## 💡 Tips & Best Practices
+
+### For Admins
+- Use descriptive company names (e.g., "Google" instead of "GOOG")
+- Ensure CSV format matches the template exactly
+- Test with small CSV files first
+- Keep ADMIN_SECRET_KEY secure and don't share publicly
+- Regularly backup your Supabase database
+
+### For Developers
+- Always test locally before deploying
+- Keep environment variables in sync across environments
+- Monitor Vercel function logs for errors
+- Use Supabase dashboard to inspect database
+- Check CORS settings if frontend can't reach backend
+
+## 📞 Support & Contact
 
 If you encounter any issues or have questions:
 
-1. **Check existing issues** in GitHub
-2. **Create new issue** with detailed description
-3. **Contact via email** or LinkedIn
+1. **Check Documentation:**
+   - [DEPLOYMENT.md](./server/DEPLOYMENT.md) - Detailed deployment guide
+   - [schema.sql](./server/schema.sql) - Database schema reference
+
+2. **GitHub Issues:**
+   - Check [existing issues](https://github.com/MohitChamyal/LeetCom/issues)
+   - Create [new issue](https://github.com/MohitChamyal/LeetCom/issues/new) with detailed description
+
+3. **Contact:**
+   - **Email:** mohitchamyal@example.com
+   - **LinkedIn:** [Mohit Chamyal](https://www.linkedin.com/in/mohit-chamyal-57254724b/)
+   - **GitHub:** [@MohitChamyal](https://github.com/MohitChamyal)
 
 ---
 
-## 🌐 Production Deployment
+## 🌐 Production URLs
 
-### Quick Deploy
-- **Deployment Guide:** See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
-- **Checklist:** See [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)
-- **Backend Guide:** See [server/DEPLOYMENT.md](./server/DEPLOYMENT.md)
+- **Frontend:** [https://leet-com.vercel.app](https://leet-com.vercel.app)
+- **Backend API:** [https://leet-com-backend.vercel.app](https://leet-com-backend.vercel.app)
+- **GitHub Repository:** [https://github.com/MohitChamyal/LeetCom](https://github.com/MohitChamyal/LeetCom)
 
-### Deploy to Vercel
-```bash
-# Backend
-cd server && vercel --prod
+---
 
-# Frontend  
-cd client && vercel --prod
-```
+## 📊 Project Stats
 
-**Environment Variables Required:**
-- Backend: `SUPABASE_URL`, `SUPABASE_KEY`, `ADMIN_SECRET_KEY`, `JWT_SECRET`, `CORS_ORIGIN`
-- Frontend: `VITE_BACKEND_URL`
+- **Total Lines of Code:** ~3,000+
+- **Components:** 8 React components
+- **API Endpoints:** 8+ REST endpoints
+- **Deployment Platform:** Vercel (Serverless)
+- **Database:** Supabase PostgreSQL
+- **Response Time:** <200ms average
 
 ---
 
 ⭐ **Don't forget to star this repository if you found it helpful!**
+
+Made with ❤️ by [Mohit Chamyal](https://github.com/MohitChamyal)
 
 
