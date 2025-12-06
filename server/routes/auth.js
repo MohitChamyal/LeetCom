@@ -73,10 +73,12 @@ router.post('/signup', async (req, res) => {
             .single();
 
         if (error) {
-            console.error('Signup error:', error);
+            console.error('Supabase insert error:', error);
+            console.error('Error details:', JSON.stringify(error, null, 2));
             return res.status(500).json({ 
                 success: false, 
-                error: 'Failed to create account' 
+                error: 'Failed to create account',
+                details: process.env.NODE_ENV === 'development' ? error.message : undefined
             });
         }
 
@@ -93,9 +95,11 @@ router.post('/signup', async (req, res) => {
 
     } catch (error) {
         console.error('Signup error:', error);
+        console.error('Error stack:', error.stack);
         res.status(500).json({ 
             success: false, 
-            error: 'Registration failed' 
+            error: 'Registration failed',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 });
