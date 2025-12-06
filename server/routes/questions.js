@@ -1,27 +1,16 @@
 const express = require('express');
 const multer = require('multer');
 const csvParser = require('csv-parser');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const { Readable } = require('stream');
 const { getSupabase } = require('../db');
 
 const router = express.Router();
 
-// Configure multer for CSV upload - use OS temp directory for serverless compatibility
-const uploadDir = process.env.VERCEL ? os.tmpdir() : path.join(__dirname, '../uploads');
-
-// Ensure upload directory exists
-try {
-    if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-    }
-} catch (error) {
-    console.warn('Could not create upload directory:', error.message);
-}
+// Use memory storage for serverless - no filesystem needed
+const storage = multer.memoryStorage();
 
 const upload = multer({
-    dest: uploadDir,
+    storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
     fileFilter: (req, file, cb) => {
         if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
@@ -34,8 +23,6 @@ const upload = multer({
 
 // Upload questions via CSV
 router.post('/upload', upload.single('csvFile'), async (req, res) => {
-    let filePath = null;
-
     try {
         if (!req.file) {
             return res.status(400).json({ 
@@ -53,12 +40,14 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
         }
 
         const company = companyName.trim().toLowerCase();
-        filePath = req.file.path;
         const questions = [];
 
-        // Parse CSV
+        // Create readable stream from buffer
+        const bufferStream = Readable.from(req.file.buffer);
+
+        // Parse CSV from memory
         await new Promise((resolve, reject) => {
-            fs.createReadStream(filePath)
+            bufferStream
                 .pipe(csvParser({ skipEmptyLines: true }))
                 .on('data', (row) => {
                     const topics = row.Topics ? 
@@ -163,12 +152,8 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
             success: false, 
             error: 'Upload failed' 
         });
-    } finally {
-        // Cleanup
-        if (filePath && fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
     }
+    // No file cleanup needed with memoryStorage
 });
 
 // Get questions by company
