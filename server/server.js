@@ -1,9 +1,21 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const config = require('./config');
 
 const app = express();
+
+// Load config with error handling
+let config;
+try {
+    config = require('./config');
+} catch (error) {
+    console.error('❌ Config error:', error.message);
+    config = {
+        PORT: 5000,
+        NODE_ENV: 'production',
+        CORS_ORIGIN: ['*']
+    };
+}
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
