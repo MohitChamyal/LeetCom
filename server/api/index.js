@@ -47,6 +47,8 @@ app.get('/', (req, res) => {
         status: 'OK',
         timestamp: new Date().toISOString(),
         version: '1.0.0',
+        requestPath: req.path,
+        requestUrl: req.url,
         endpoints: {
             health: '/health',
             test: '/api/test',
