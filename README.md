@@ -193,6 +193,28 @@ If you encounter any issues or have questions:
 
 ---
 
+## 🌐 Production Deployment
+
+### Quick Deploy
+- **Deployment Guide:** See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
+- **Checklist:** See [DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)
+- **Backend Guide:** See [server/DEPLOYMENT.md](./server/DEPLOYMENT.md)
+
+### Deploy to Vercel
+```bash
+# Backend
+cd server && vercel --prod
+
+# Frontend  
+cd client && vercel --prod
+```
+
+**Environment Variables Required:**
+- Backend: `SUPABASE_URL`, `SUPABASE_KEY`, `ADMIN_SECRET_KEY`, `JWT_SECRET`, `CORS_ORIGIN`
+- Frontend: `VITE_BACKEND_URL`
+
+---
+
 ⭐ **Don't forget to star this repository if you found it helpful!**
 
 
