@@ -31,6 +31,21 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/auth')); // Frontend calls /api/admin
 app.use('/api/questions', require('./routes/questions'));
 
+// Root endpoint
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'LeetCom API Server',
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        endpoints: {
+            health: '/health',
+            auth: '/api/auth',
+            admin: '/api/admin',
+            questions: '/api/questions'
+        }
+    });
+});
+
 // Health check
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -49,43 +64,16 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
-const PORT = config.PORT;
-const server = app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📡 Environment: ${config.NODE_ENV}`);
-    console.log(`🔗 Supabase: Connected`);
-    console.log(`✅ Server is ready`);
-});
-
-// Handle server errors
-server.on('error', (error) => {
-    if (error.code === 'EADDRINUSE') {
-        console.error(`❌ Port ${PORT} is already in use`);
-        process.exit(1);
-    } else {
-        console.error('❌ Server error:', error);
-        process.exit(1);
-    }
-});
-
-// Graceful shutdown
-const shutdown = () => {
-    console.log('\n🛑 Shutting down gracefully...');
-    server.close(() => {
-        console.log('✅ Server closed');
-        process.exit(0);
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = config.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+        console.log(`📡 Environment: ${config.NODE_ENV}`);
+        console.log(`🔗 Supabase: Connected`);
+        console.log(`✅ Server is ready`);
     });
-    
-    // Force shutdown after 10 seconds
-    setTimeout(() => {
-        console.error('❌ Forced shutdown');
-        process.exit(1);
-    }, 10000);
-};
+}
 
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
-
-// Export for Vercel
+// Export for Vercel serverless
 module.exports = app;
