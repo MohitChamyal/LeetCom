@@ -1,24 +1,31 @@
 {
-  "name": "server",
+  "name": "leetcom-server",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "",
+  "description": "Backend server for LeetCom with Supabase PostgreSQL",
+  "main": "server.js",
   "type": "commonjs",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "engines": {
+    "node": ">=18.x"
   },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "echo 'No build step required'",
+    "vercel-build": "echo 'No build step required'"
+  },
+  "keywords": ["leetcode", "interview", "questions"],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.56.0",
-    "bcryptjs": "^3.0.2",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "csv-parser": "^3.2.0",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "mongodb": "^6.18.0",
-    "mongoose": "^8.17.2",
-    "multer": "^2.0.2",
-    "nodemon": "^3.1.10"
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
