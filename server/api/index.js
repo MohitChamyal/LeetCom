@@ -49,6 +49,57 @@ app.get('/api/test', (req, res) => {
     });
 });
 
+// Test Supabase connection
+app.get('/api/test-db', async (req, res) => {
+    try {
+        const { getSupabase } = require('../db');
+        const supabase = getSupabase();
+        
+        // Test connection by trying to count users
+        const { data, error, count } = await supabase
+            .from('users')
+            .select('*', { count: 'exact', head: true });
+        
+        if (error) {
+            return res.json({
+                success: false,
+                message: 'Supabase connection failed',
+                error: error.message,
+                hint: error.hint,
+                details: error.details,
+                code: error.code
+            });
+        }
+        
+        // Test questions table
+        const { data: qData, error: qError, count: qCount } = await supabase
+            .from('questions')
+            .select('*', { count: 'exact', head: true });
+        
+        res.json({
+            success: true,
+            message: 'Supabase connection working',
+            tables: {
+                users: {
+                    exists: !error,
+                    count: count || 0
+                },
+                questions: {
+                    exists: !qError,
+                    count: qCount || 0
+                }
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Test failed',
+            error: error.message,
+            stack: error.stack.split('\n').slice(0, 3)
+        });
+    }
+});
+
 // Load routes with error handling
 let routesLoaded = false;
 let routeError = null;
