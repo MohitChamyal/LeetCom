@@ -55,47 +55,78 @@ app.get('/api/test-db', async (req, res) => {
         const { getSupabase } = require('../db');
         const supabase = getSupabase();
         
-        // Test connection by trying to count users
-        const { data, error, count } = await supabase
+        console.log('Testing Supabase connection...');
+        
+        // Test 1: Try to select from users
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id')
+            .limit(1);
+        
+        // Test 2: Try to select from questions
+        const { data: qData, error: qError } = await supabase
+            .from('questions')
+            .select('id')
+            .limit(1);
+        
+        // Test 3: Try to count users
+        const { count: userCount, error: countError } = await supabase
             .from('users')
             .select('*', { count: 'exact', head: true });
         
-        if (error) {
-            return res.json({
-                success: false,
-                message: 'Supabase connection failed',
-                error: error.message,
-                hint: error.hint,
-                details: error.details,
-                code: error.code
-            });
-        }
-        
-        // Test questions table
-        const { data: qData, error: qError, count: qCount } = await supabase
+        // Test 4: Try to count questions
+        const { count: qCount, error: qCountError } = await supabase
             .from('questions')
             .select('*', { count: 'exact', head: true });
         
-        res.json({
-            success: true,
-            message: 'Supabase connection working',
-            tables: {
-                users: {
-                    exists: !error,
-                    count: count || 0
+        const response = {
+            success: !userError && !qError,
+            timestamp: new Date().toISOString(),
+            supabaseUrl: process.env.SUPABASE_URL,
+            hasKey: !!process.env.SUPABASE_KEY,
+            keyPrefix: process.env.SUPABASE_KEY?.substring(0, 20) + '...',
+            tests: {
+                usersSelect: {
+                    success: !userError,
+                    error: userError ? {
+                        message: userError.message,
+                        code: userError.code,
+                        hint: userError.hint,
+                        details: userError.details
+                    } : null,
+                    dataReceived: !!userData && userData.length > 0
                 },
-                questions: {
-                    exists: !qError,
-                    count: qCount || 0
+                questionsSelect: {
+                    success: !qError,
+                    error: qError ? {
+                        message: qError.message,
+                        code: qError.code,
+                        hint: qError.hint,
+                        details: qError.details
+                    } : null,
+                    dataReceived: !!qData && qData.length > 0
+                },
+                usersCount: {
+                    success: !countError,
+                    count: userCount || 0,
+                    error: countError ? countError.message : null
+                },
+                questionsCount: {
+                    success: !qCountError,
+                    count: qCount || 0,
+                    error: qCountError ? qCountError.message : null
                 }
             }
-        });
+        };
+        
+        res.json(response);
     } catch (error) {
+        console.error('Test-db error:', error);
         res.status(500).json({
             success: false,
             message: 'Test failed',
             error: error.message,
-            stack: error.stack.split('\n').slice(0, 3)
+            stack: error.stack?.split('\n').slice(0, 5)
         });
     }
 });
