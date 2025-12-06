@@ -8,6 +8,7 @@ const app = express();
 let config;
 try {
     config = require('./config');
+    console.log('✅ Config loaded');
 } catch (error) {
     console.error('❌ Config error:', error.message);
     config = {
@@ -21,34 +22,26 @@ try {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// CORS
+// Simple CORS for debugging
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl)
-        if (!origin) return callback(null, true);
-        
-        if (config.CORS_ORIGIN.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: '*',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/admin', require('./routes/auth')); // Frontend calls /api/admin
-app.use('/api/questions', require('./routes/questions'));
-
-// Root endpoint
+// Root endpoint - MUST come before routes
 app.get('/', (req, res) => {
     res.json({ 
         message: 'LeetCom API Server',
         status: 'OK', 
         timestamp: new Date().toISOString(),
+        env: {
+            NODE_ENV: config.NODE_ENV,
+            hasSupabaseUrl: !!config.SUPABASE_URL,
+            hasSupabaseKey: !!config.SUPABASE_KEY,
+            hasJwtSecret: !!config.JWT_SECRET
+        },
         endpoints: {
             health: '/health',
             auth: '/api/auth',
@@ -60,8 +53,27 @@ app.get('/', (req, res) => {
 
 // Health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'OK', timestamp: new Date().toISOString() });
+    res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
 });
+
+// Load routes with error handling
+try {
+    const authRoutes = require('./routes/auth');
+    const questionsRoutes = require('./routes/questions');
+    
+    app.use('/api/auth', authRoutes);
+    app.use('/api/admin', authRoutes);
+    app.use('/api/questions', questionsRoutes);
+    
+    console.log('✅ Routes loaded');
+} catch (error) {
+    console.error('❌ Route loading error:', error.message);
+    console.error(error.stack);
+}
 
 // 404 handler
 app.use((req, res) => {
