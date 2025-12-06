@@ -50,7 +50,12 @@ app.get('/api/test', (req, res) => {
 });
 
 // Load routes with error handling
+let routesLoaded = false;
+let routeError = null;
+
 try {
+    console.log('🔄 Loading routes...');
+    
     const authRoutes = require('../routes/auth');
     const questionsRoutes = require('../routes/questions');
     
@@ -58,20 +63,52 @@ try {
     app.use('/api/admin', authRoutes);
     app.use('/api/questions', questionsRoutes);
     
+    routesLoaded = true;
     console.log('✅ Routes loaded successfully');
 } catch (error) {
+    routeError = error;
     console.error('❌ Route loading error:', error.message);
-    console.error(error.stack);
+    console.error('Stack:', error.stack);
+    
+    // Provide diagnostic endpoint
+    app.get('/api/diagnostic', (req, res) => {
+        res.json({
+            routesLoaded: false,
+            error: {
+                message: error.message,
+                stack: error.stack.split('\n').slice(0, 5)
+            },
+            env: {
+                NODE_ENV: process.env.NODE_ENV,
+                hasSupabaseUrl: !!process.env.SUPABASE_URL,
+                hasSupabaseKey: !!process.env.SUPABASE_KEY,
+                hasJwtSecret: !!process.env.JWT_SECRET,
+                hasAdminSecret: !!process.env.ADMIN_SECRET_KEY
+            }
+        });
+    });
     
     // Fallback routes if main routes fail
-    app.post('/api/auth/*', (req, res) => {
-        res.status(503).json({ error: 'Auth routes temporarily unavailable', details: error.message });
+    app.all('/api/auth/*', (req, res) => {
+        res.status(503).json({ 
+            error: 'Auth routes unavailable', 
+            reason: error.message,
+            hint: 'Check /api/diagnostic for details'
+        });
     });
-    app.post('/api/admin/*', (req, res) => {
-        res.status(503).json({ error: 'Admin routes temporarily unavailable', details: error.message });
+    app.all('/api/admin/*', (req, res) => {
+        res.status(503).json({ 
+            error: 'Admin routes unavailable', 
+            reason: error.message,
+            hint: 'Check /api/diagnostic for details'
+        });
     });
     app.all('/api/questions/*', (req, res) => {
-        res.status(503).json({ error: 'Questions routes temporarily unavailable', details: error.message });
+        res.status(503).json({ 
+            error: 'Questions routes unavailable', 
+            reason: error.message,
+            hint: 'Check /api/diagnostic for details'
+        });
     });
 }
 
