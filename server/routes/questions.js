@@ -160,6 +160,7 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
 router.get('/:companyName', async (req, res) => {
     try {
         const company = req.params.companyName?.toLowerCase().trim();
+        console.log(`📋 Fetching questions for company: ${company}`);
 
         if (!company) {
             return res.status(400).json({ 
@@ -219,6 +220,7 @@ router.get('/:companyName', async (req, res) => {
 // Get all companies
 router.get('/', async (req, res) => {
     try {
+        console.log('📋 Fetching all companies...');
         const supabase = getSupabase();
 
         const { data, error } = await supabase
@@ -226,7 +228,8 @@ router.get('/', async (req, res) => {
             .select('company, difficulty, updated_at');
 
         if (error) {
-            console.error('Query error:', error);
+            console.error('❌ Query error:', error);
+            console.error('Error details:', JSON.stringify(error, null, 2));
             return res.status(500).json({ 
                 success: false, 
                 error: 'Failed to fetch companies' 
