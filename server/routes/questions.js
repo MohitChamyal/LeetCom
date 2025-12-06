@@ -3,13 +3,25 @@ const multer = require('multer');
 const csvParser = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { getSupabase } = require('../db');
 
 const router = express.Router();
 
-// Configure multer for CSV upload - use /tmp for serverless
+// Configure multer for CSV upload - use OS temp directory for serverless compatibility
+const uploadDir = process.env.VERCEL ? os.tmpdir() : path.join(__dirname, '../uploads');
+
+// Ensure upload directory exists
+try {
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+} catch (error) {
+    console.warn('Could not create upload directory:', error.message);
+}
+
 const upload = multer({
-    dest: '/tmp/uploads/',
+    dest: uploadDir,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
     fileFilter: (req, file, cb) => {
         if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
