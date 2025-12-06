@@ -7,9 +7,9 @@ const { getSupabase } = require('../db');
 
 const router = express.Router();
 
-// Configure multer for CSV upload
+// Configure multer for CSV upload - use /tmp for serverless
 const upload = multer({
-    dest: 'uploads/',
+    dest: '/tmp/uploads/',
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
     fileFilter: (req, file, cb) => {
         if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
