@@ -7,7 +7,38 @@ const app = express();
 // Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(cors({ origin: '*' }));
+
+// CORS configuration
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = [
+            'https://leet-com.vercel.app',
+            'https://leetcom-frontend.vercel.app',
+            'http://localhost:5173',
+            'http://localhost:3000'
+        ];
+        
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.log('Blocked origin:', origin);
+            callback(null, true); // Allow all for now to debug
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Length', 'X-Request-Id'],
+    maxAge: 86400 // 24 hours
+};
+
+app.use(cors(corsOptions));
+
+// Additional CORS headers for preflight
+app.options('*', cors(corsOptions));
 
 // Root endpoint
 app.get('/', (req, res) => {
