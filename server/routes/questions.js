@@ -162,22 +162,41 @@ router.get('/all', async (req, res) => {
         console.log('📋 Fetching all companies...');
         const supabase = getSupabase();
 
-        const { data, error } = await supabase
-            .from('questions')
-            .select('company, difficulty, updated_at');
+        // Fetch all questions with pagination to ensure we get everything
+        let allData = [];
+        let from = 0;
+        const pageSize = 1000;
+        let hasMore = true;
 
-        if (error) {
-            console.error('❌ Query error:', error);
-            console.error('Error details:', JSON.stringify(error, null, 2));
-            return res.status(500).json({ 
-                success: false, 
-                error: 'Failed to fetch companies' 
-            });
+        while (hasMore) {
+            const { data, error } = await supabase
+                .from('questions')
+                .select('company, difficulty, updated_at')
+                .range(from, from + pageSize - 1);
+
+            if (error) {
+                console.error('❌ Query error:', error);
+                console.error('Error details:', JSON.stringify(error, null, 2));
+                return res.status(500).json({ 
+                    success: false, 
+                    error: 'Failed to fetch companies' 
+                });
+            }
+
+            if (data && data.length > 0) {
+                allData = allData.concat(data);
+                from += pageSize;
+                hasMore = data.length === pageSize;
+            } else {
+                hasMore = false;
+            }
         }
+
+        console.log(`✅ Fetched ${allData.length} total questions`);
 
         // Aggregate by company
         const companyMap = new Map();
-        (data || []).forEach(q => {
+        allData.forEach(q => {
             if (!companyMap.has(q.company)) {
                 companyMap.set(q.company, {
                     name: q.company,
@@ -202,6 +221,8 @@ router.get('/all', async (req, res) => {
                 lastUpdated: c.lastUpdated
             }))
             .sort((a, b) => a.name.localeCompare(b.name));
+
+        console.log(`✅ Returning ${companies.length} companies`);
 
         res.json({
             success: true,
