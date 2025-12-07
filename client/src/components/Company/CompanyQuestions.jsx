@@ -14,6 +14,8 @@ const CompanyQuestions = () => {
   const [filteredProblems, setFilteredProblems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [displayedCount, setDisplayedCount] = useState(9);
+  const ITEMS_PER_PAGE = 9;
 
   // Scroll to top when component mounts or company changes
   useEffect(() => {
@@ -75,7 +77,17 @@ const CompanyQuestions = () => {
     }
 
     setFilteredProblems(filtered);
+    setDisplayedCount(9); // Reset to initial count when filters change
   }, [problems, difficulty, sortBy]);
+
+  const handleLoadMore = () => {
+    const remaining = filteredProblems.length - displayedCount;
+    const toAdd = remaining < ITEMS_PER_PAGE ? remaining : ITEMS_PER_PAGE;
+    setDisplayedCount(prev => prev + toAdd);
+  };
+
+  const displayedProblems = filteredProblems.slice(0, displayedCount);
+  const hasMore = displayedCount < filteredProblems.length;
 
   const handleDifficultyChange = (e) => {
     setDifficulty(e.target.value);
@@ -169,8 +181,8 @@ const CompanyQuestions = () => {
               <div className="header-item">Action</div>
             </div>
 
-            {filteredProblems.length > 0 ? (
-              filteredProblems.map((problem, index) => (
+            {displayedProblems.length > 0 ? (
+              displayedProblems.map((problem, index) => (
                 <div key={problem._id || index} className="problem-item">
                   <div className="problem-title">
                     <span className="problem-name">{problem.title}</span>
@@ -224,6 +236,14 @@ const CompanyQuestions = () => {
               </div>
             )}
           </div>
+
+          {hasMore && (
+            <div className="load-more-container">
+              <button className="load-more-btn" onClick={handleLoadMore}>
+                Load More Questions ({filteredProblems.length - displayedCount} remaining)
+              </button>
+            </div>
+          )}
         </>
       )}
      
