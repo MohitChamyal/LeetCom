@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { adminAPI } from './services/api.js';
 import NotFound from './components/NotFound/NotFound.jsx';
 
+// Version: 1.0.1 - Fixed API routing
 const App = () => {
   const [listCompany, setListCompany] = useState([]);
   const [loading, setLoading] = useState(true);
