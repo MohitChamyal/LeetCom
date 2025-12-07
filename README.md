@@ -288,7 +288,3 @@ LeetCom/
 - **404 Handling** - Custom not found page
 - **CORS Enabled** - Secure cross-origin requests
 - **Serverless Architecture** - Fast, scalable deployment on Vercel
-<<<<<<< HEAD
-=======
-
->>>>>>> d5b0428c29c0b49e3485cdef86b0327978ae1c79
