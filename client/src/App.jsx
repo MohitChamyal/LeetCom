@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LoginSignUp from './components/Login/LoginSignUp.jsx';
 import Home from './components/Home/Home.jsx';
 import Admin from './components/Admin/Admin.jsx';
@@ -8,6 +8,18 @@ import { adminAPI } from './services/api.js';
 import NotFound from './components/NotFound/NotFound.jsx';
 
 // Version: 1.0.1 - Fixed API routing
+
+// Scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 const App = () => {
   const [listCompany, setListCompany] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +84,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route 
           path='/login' 

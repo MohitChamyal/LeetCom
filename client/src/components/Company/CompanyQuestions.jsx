@@ -15,6 +15,11 @@ const CompanyQuestions = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Scroll to top when component mounts or company changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [companyName]);
+
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
