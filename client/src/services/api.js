@@ -71,7 +71,7 @@ export const adminAPI = {
   // Get all companies with question counts
   getAllCompanies: async () => {
     try {
-      const response = await api.get('/questions');
+      const response = await api.get('/questions/all');
       return response.data;
     } catch (error) {
       throw error.response?.data || { error: 'Network error fetching companies' };

@@ -156,6 +156,67 @@ router.post('/upload', upload.single('csvFile'), async (req, res) => {
     // No file cleanup needed with memoryStorage
 });
 
+// Get all companies (MUST come before /:companyName to match /all specifically)
+router.get('/all', async (req, res) => {
+    try {
+        console.log('📋 Fetching all companies...');
+        const supabase = getSupabase();
+
+        const { data, error } = await supabase
+            .from('questions')
+            .select('company, difficulty, updated_at');
+
+        if (error) {
+            console.error('❌ Query error:', error);
+            console.error('Error details:', JSON.stringify(error, null, 2));
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Failed to fetch companies' 
+            });
+        }
+
+        // Aggregate by company
+        const companyMap = new Map();
+        (data || []).forEach(q => {
+            if (!companyMap.has(q.company)) {
+                companyMap.set(q.company, {
+                    name: q.company,
+                    count: 0,
+                    difficulties: new Set(),
+                    lastUpdated: q.updated_at
+                });
+            }
+            const company = companyMap.get(q.company);
+            company.count++;
+            company.difficulties.add(q.difficulty);
+            if (new Date(q.updated_at) > new Date(company.lastUpdated)) {
+                company.lastUpdated = q.updated_at;
+            }
+        });
+
+        const companies = Array.from(companyMap.values())
+            .map(c => ({
+                name: c.name,
+                count: c.count,
+                difficulties: Array.from(c.difficulties),
+                lastUpdated: c.lastUpdated
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+
+        res.json({
+            success: true,
+            companies
+        });
+
+    } catch (error) {
+        console.error('Get companies error:', error);
+        res.status(500).json({ 
+            success: false, 
+            error: 'Failed to retrieve companies' 
+        });
+    }
+});
+
 // Get questions by company
 router.get('/:companyName', async (req, res) => {
     try {
@@ -213,67 +274,6 @@ router.get('/:companyName', async (req, res) => {
         res.status(500).json({ 
             success: false, 
             error: 'Failed to retrieve questions' 
-        });
-    }
-});
-
-// Get all companies
-router.get('/', async (req, res) => {
-    try {
-        console.log('📋 Fetching all companies...');
-        const supabase = getSupabase();
-
-        const { data, error } = await supabase
-            .from('questions')
-            .select('company, difficulty, updated_at');
-
-        if (error) {
-            console.error('❌ Query error:', error);
-            console.error('Error details:', JSON.stringify(error, null, 2));
-            return res.status(500).json({ 
-                success: false, 
-                error: 'Failed to fetch companies' 
-            });
-        }
-
-        // Aggregate by company
-        const companyMap = new Map();
-        (data || []).forEach(q => {
-            if (!companyMap.has(q.company)) {
-                companyMap.set(q.company, {
-                    name: q.company,
-                    count: 0,
-                    difficulties: new Set(),
-                    lastUpdated: q.updated_at
-                });
-            }
-            const company = companyMap.get(q.company);
-            company.count++;
-            company.difficulties.add(q.difficulty);
-            if (new Date(q.updated_at) > new Date(company.lastUpdated)) {
-                company.lastUpdated = q.updated_at;
-            }
-        });
-
-        const companies = Array.from(companyMap.values())
-            .map(c => ({
-                name: c.name,
-                count: c.count,
-                difficulties: Array.from(c.difficulties),
-                lastUpdated: c.lastUpdated
-            }))
-            .sort((a, b) => a.name.localeCompare(b.name));
-
-        res.json({
-            success: true,
-            companies
-        });
-
-    } catch (error) {
-        console.error('Get companies error:', error);
-        res.status(500).json({ 
-            success: false, 
-            error: 'Failed to retrieve companies' 
         });
     }
 });
