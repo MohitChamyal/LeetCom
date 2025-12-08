@@ -6,6 +6,7 @@ import CompanyQuestions from './components/Company/CompanyQuestions.jsx';
 import { useState, useEffect } from 'react';
 import { adminAPI } from './services/api.js';
 import NotFound from './components/NotFound/NotFound.jsx';
+import { Analytics } from '@vercel/analytics/react';
 
 // Version: 1.0.1 - Fixed API routing
 
@@ -120,6 +121,7 @@ const App = () => {
         <Route path='/company/:companyName' element={<CompanyQuestions />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Analytics />
     </BrowserRouter>
   )
 }
