@@ -1,12 +1,8 @@
 // Simple serverless function for Vercel
 const express = require('express');
 const cors = require('cors');
-const { injectSpeedInsights } = require('@vercel/speed-insights');
 
 const app = express();
-
-// Inject Vercel Speed Insights
-injectSpeedInsights();
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
