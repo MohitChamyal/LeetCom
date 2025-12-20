@@ -6,12 +6,12 @@ import './Home.css';
 const Home = ({ listCompany }) => {
   const [filteredCompany, setFilteredCompany] = useState(listCompany);
   const [searchQuery, setSearchQuery] = useState('');
-  const [displayedCount, setDisplayedCount] = useState(9);
-  const ITEMS_PER_PAGE = 9;
+  const [displayedCount, setDisplayedCount] = useState(15);
+  const ITEMS_PER_PAGE = 15;
 
   const handleSearchChange = (query) => {
     setSearchQuery(query);
-    setDisplayedCount(9); // Reset to initial count on search
+    setDisplayedCount(15); // Reset to initial count on search
 
     if (query.trim() === "") {
       setFilteredCompany(listCompany);
@@ -24,7 +24,7 @@ const Home = ({ listCompany }) => {
   };
 
   useEffect(() => {
-    setDisplayedCount(9); // Reset when listCompany changes
+    setDisplayedCount(15); // Reset when listCompany changes
     if (searchQuery.trim() === "") {
       setFilteredCompany(listCompany);
     } else {
@@ -84,7 +84,7 @@ const Home = ({ listCompany }) => {
         {hasMore && (
           <div className="load-more-container">
             <button className="load-more-btn" onClick={handleLoadMore}>
-              Load More Companies ({filteredCompany.length - displayedCount} remaining)
+              Load More
             </button>
           </div>
         )}

@@ -192,7 +192,27 @@
   cursor: pointer;
 }
 
+.problem-name-link {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 15px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.problem-name-link:hover {
+  color: #2563eb;
+  transform: translateX(4px);
+}
+
 .problem-item:hover .problem-name {
+  color: #2563eb;
+  transform: translateX(4px);
+}
+
+.problem-item:hover .problem-name-link {
   color: #2563eb;
   transform: translateX(4px);
 }
