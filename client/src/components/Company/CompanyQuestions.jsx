@@ -94,10 +94,6 @@ const CompanyQuestions = () => {
     }
   };
 
-  const handleGoBack = () => {
-    navigate('/');
-  };
-
   if (loading) {
     return (
       <div className='company-questions-container'>
@@ -113,9 +109,6 @@ const CompanyQuestions = () => {
   return (
     <div className='company-questions-container'>
       <div className="company-header">
-        <button className="back-btn" onClick={handleGoBack}>
-          ← Back to Companies
-        </button>
         <h1 className="company-title">
           {companyName ? companyName.charAt(0).toUpperCase() + companyName.slice(1) : 'Company'} Questions
         </h1>
